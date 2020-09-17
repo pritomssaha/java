@@ -10,7 +10,7 @@ public class test {
 		System.out.println("string format: "+test2);	
 				
 		char[] c = new char[test.length()+1];
-		test.getChars(0, test.length(), c, 1);
+		test.getChars(0, test.length(), c, 0);
 		System.out.print("getchar: ");
 		for(char p:c) {
 			System.out.print(p+" ");
@@ -60,10 +60,10 @@ public class test {
 		
 		System.out.println();
 		
-		System.out.println(test3.toUpperCase());
-		System.out.println(test3.toLowerCase());
+		System.out.println("toUpperCase: "+test3.toUpperCase());
+		System.out.println("toLowerCase: "+test3.toLowerCase());
 		String test4="        "+test3.toUpperCase()+"       ";
-		System.out.println(test4);
+		System.out.println("without trim: "+test4);
 		test4=test4.trim();
 		System.out.println("trim(): "+test4);
 		
