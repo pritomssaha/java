@@ -153,16 +153,39 @@ public class SLinkedList {
 		}
 	}
 	
+	public void sort() {
+		Node current=head;
+		Node index=null;
+		int temp;
+		
+		if(head==null)
+			throw new IndexOutOfBoundsException();
+		else {
+			while(current!=null) {
+				index=current.next;
+				while(index!=null) {
+					if(current.data<index.data) {
+						temp=index.data;
+						index.data=current.data;
+						current.data=temp;
+					}
+					index=index.next;
+				}
+				current=current.next;
+			}
+		}
+	}
+	
 	//Main method
 	public static void main(String[] args) {
 		SLinkedList sl=new SLinkedList();
 		sl.addLast(25);
 		sl.addLast(39);
-		sl.addLast(93);
+		sl.addFirst(69);
 		sl.print();
-		System.out.println();		
-		sl.reverse();		
-		System.out.println("\nnumberOfOccurence(): "+sl.numberOfOccurence(25));
+		System.out.println();
+		sl.sort();
+		sl.print();
 	}
 
 }
