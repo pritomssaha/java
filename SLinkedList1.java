@@ -176,16 +176,6 @@ public class SLinkedList {
 		}
 	}
 	
-	public int middleValue() {
-		Node first=head;
-		Node second=head;
-		while(second.next!=null) {
-			first=first.next;
-			second=second.next.next;
-		}
-		return first.data;
-	}
-	
 	//Main method
 	public static void main(String[] args) {
 		SLinkedList sl=new SLinkedList();
@@ -196,7 +186,6 @@ public class SLinkedList {
 		System.out.println();
 		sl.sort();
 		sl.print();
-		System.out.println(sl.middleValue());
 	}
 
 }
