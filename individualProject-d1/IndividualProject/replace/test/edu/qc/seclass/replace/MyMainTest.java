@@ -111,9 +111,10 @@ public class MyMainTest {
     Size :  Empty
     */
     @Test(expected = FileNotFoundException.class)
-    public void myMainTest1() throws Exception {
+    public void myMainTest1() {
         String args[] = {"Howdy", "Willson", "--"};
         Main.main(args);
+        assertEquals("Usage: Replace [-b] [-f] [-l] [-i] <from> <to> -- <filename> [<filename>]*",errStream.toString().trim());
     }
 
     /*
@@ -285,16 +286,6 @@ public class MyMainTest {
         assertEquals(expected2, actual2);
     }
 
-/*Test Case 50 		(Key = 2.3.0.3.2.1.1.3.)
-   Size                                            :  Not empty
-   Number of files provided                        :  Many
-   Whether the files specifies exist               :  <n/a>
-   Options                                         :  -l
-   Parameter from                                  :  One
-   Parameter to                                    :  Zero
-   Number of matches of the pattern in second file :  Zero
-   Replace Value                                   :  Replace lastOccurence
- */
 /*Test Case 71 		(Key = 2.3.0.4.2.1.1.4.)
    Size                                            :  Not empty
    Number of files provided                        :  Many
@@ -403,7 +394,7 @@ public void myMainTest7() throws Exception {
                 "-a) Item 1\n" +
                 "-b) Item 2\n" +
                 "...\n" +
-                "and says \"howdy Bill\" twice";
+                "and says \"howdy BILL\" twice";
 
         String actual1 = getFileContent(inputFile1.getPath());
         String actual2 = getFileContent(inputFile2.getPath());
@@ -444,7 +435,7 @@ public void myMainTest7() throws Exception {
                 "-a) Item 1\n" +
                 "-b) Item 2\n" +
                 "...\n" +
-                "and says \"howdy Bill\" twice";
+                "and says \"Robert Bill\" twice";
 
         String actual1 = getFileContent(inputFile1.getPath());
         String actual2 = getFileContent(inputFile2.getPath());

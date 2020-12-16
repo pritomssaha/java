@@ -1,221 +1,272 @@
 package edu.qc.seclass.replace;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main
-{
+public class Main {
 
-public static void main(String[] args)
-   {
-// TODO: Empty skeleton method
+    public static void main(String[] args) {
+        String replaceFrom = "";
+        String replaceTo = "";
+        int point = 0;
+        List<String> fileList = new ArrayList<>();
+        List<String> replaceFromList = new ArrayList<>();
+        List<String> replaceToList = new ArrayList<>();
+        boolean bFlag = false;
+        boolean fFlag = false;
+        boolean lFlag = false;
+        boolean iFlag = false;
+        boolean doubleDash=false;
 
-String from_String;
-String to_String;
+        /*
+        * if the argument is less than 3, then error in the argument and return usage
+        * argument should look like
+        * "StringFrom" "StringTo" "--" "file1" "file2" without OP option or,
+        * "-i" "StringFrom" "StringTo" "--" "file1" "file2" with OP option
+        *
+        */
+        if (args.length < 3) {
+            usage();
+            return;
+        }
+        /*
+        *
+        * iterate through all the argument and flag the OPT option
+        *
+        * "-i", "-f" "Howdy", "Hello", "--", inputFile1.getPath(), inputFile2.getPath(), inputFile3.getPath()
+        * ---------   -----    -----    --    --------------------------------------------------------------
+        * point->0      1        2       3                    4
+        *
+        */
+        for (int i=0;i< args.length;i++) {
+            /*if(args[i].equalsIgnoreCase("replace")){
+                usage();
+                break;
+            }*/
+            /*if (!argument.startsWith("-")) {
+                replaceFromList.add(argument);
+                point = 2;
+                continue;
+            }*/
 
-int point = 0;
+            if(args[i].equals("--"))
+                doubleDash=true;
 
-List<String> file_List = new ArrayList<>();
-  
-List<String> from_StringList = new ArrayList<>();
-  
-List<String> to_StringList = new ArrayList<>();
-  
-boolean var_b = false;
-boolean var_f = false;
-boolean var_l = false;
-boolean var_i = false;
-  
-if (args.length < 3)
-       {
-usage();
-return;
-}
-for (String arg : args)
-       {
-if (point == 0)
-{
-   if (arg.equals("-b"))
-{
-var_b = true;
-continue;
-}
-   if (arg.equals("-f"))
-{
-var_f = true;
-continue;
-}
-if (arg.equals("-l"))
-{
-var_l = true;
-continue;
-}
-if (arg.equals("-i"))
-{
-var_i = true;
-continue;
-}
-if (arg.equals("--"))
-{
-point += 1;
-continue;
-}
-if (arg.startsWith("-") && !arg.equals("-f") && !arg.equals("-l") && !arg.equals("-b") && !arg.equals("-i"))
-               {
-usage();
-return;
-}
-if (!arg.startsWith("-"))
-               {
-from_StringList.add(arg);
-point = 2;
-continue;
-}
-}
-if (point == 1)
-{
-from_StringList.add(arg);
-point = 2;
-continue;
-}
-  
-if (point == 2)
-{
-to_StringList.add(arg);
-point = 3;
-continue;
-}
-if (point == 3 && arg.equals("--"))
-{
-point = 4;
-continue;
-}
-if (point == 3 && !arg.equals("--"))
-{
-from_StringList.add(arg);
-point = 2;
-continue;
-}
-if (point == 4)
-{
-file_List.add(arg);
-continue;
-}
-}
+            if (point == 0) {
+                if (!args[i].startsWith("-")) {
+                    replaceFromList.add(args[i]);
+                    point+=2;
+                    continue;
+                }
 
-if (file_List.size() == 0)
-{
-usage();
-return;
-}
+                //OPT option
+                if (args[i].equals("-b")) {
+                    bFlag = true;
+                    continue;
+                }
+                if (args[i].equals("-f")) {
+                    fFlag = true;
+                    continue;
+                }
+                if (args[i].equals("-l")) {
+                    lFlag = true;
+                    continue;
+                }
+                if (args[i].equals("-i")) {
+                    iFlag = true;
+                    continue;
+                }
+                if (doubleDash) {
+                    point++;
+                    continue;
+                }
+                /*
+                * wrong syntax
+                */
+                if (args[i].startsWith("-")) {
+                    if (!args[i].equals("-f")) {
+                        usage();
+                        break;
+                    }
+                    if (!args[i].equals("-l")) {
+                        usage();
+                        break;
+                    }
+                    if (!args[i].equals("-b")) {
+                        usage();
+                        break;
+                    }
+                    if (!args[i].equals("-i")) {
+                        usage();
+                        break;
+                    }
 
-if (from_StringList.size() == 0)
-{
-usage();
-return;
-}
-if (to_StringList.size() == 0)
-{
-usage();
-return;
-}
-if (from_StringList.size() != to_StringList.size())
-{
-usage();
-return;
-}
+                }
 
-String regex = "";
-if (var_i)
-       {
-regex = "(?i)";
-}
 
-for (int l = 0; l < from_StringList.size(); l++)
-       {
+            }
 
-   from_String = from_StringList.get(l);
-if (from_String.equals(""))
-           {
-               usage();
-               return;
-           }
-to_String = to_StringList.get(l);
-  
-for (String fileName : file_List)
-           {
-try
-               {
-if (var_b)
-                   {// backup files first
-Path p_path = Paths.get(fileName);
-Path p_path_b = Paths.get(fileName + ".bck");
-int index = fileName.lastIndexOf(File.separator);
-String fileShortName = fileName.substring(index + 1);
-if (Files.notExists(p_path_b))
-                       {
-String info;
-info = new String(Files.readAllBytes(p_path), StandardCharsets.UTF_8);
-FileWriter fw = new FileWriter(fileName + ".bck");
-fw.write(info);
-fw.close();
-}
-                       else
-                       {
-System.err.println("Not performing replace for " + fileShortName + ": Backup file already exists");
-continue;
-}
-}
+            if (point == 1) {
+                replaceFromList.add(args[i]);
+                point ++;
+                continue;
+            }
 
-String info = new String(Files.readAllBytes(Paths.get(fileName)),
-StandardCharsets.UTF_8);
-FileWriter fw = new FileWriter(fileName);
-// if none of first or last flag is on
-if (!var_f && !var_l)
-                   {
-                       info = info.replaceAll(regex + from_String, to_String);
-                   }
-// if first or last flag is on
-else
-                   {
-if (var_f)
-                       {
-                           info = info.replaceFirst(regex + from_String, to_String);
-                       }
-if (var_l)
-                       {
-String r_info = new StringBuffer(info).reverse().toString();
-from_String = new StringBuffer(from_String).reverse().toString();
-to_String = new StringBuffer(to_String).reverse().toString();
-r_info = r_info.replaceFirst(regex + from_String, to_String);
-info = new StringBuffer(r_info).reverse().toString();
-}
-}
-fw.write(info);
-fw.close();
+            if (point == 2) {
+                replaceToList.add(args[i]);
+                point ++;
+                continue;
+            }
+            if (point == 3 && doubleDash) {
+                point ++;
+                continue;
+            }
+            if (point == 3 && !doubleDash) {
+                replaceFromList.add(args[i]);
+                point = 2;
+                //usage();
+                continue;
+            }
+            if (point == 4) {
+                fileList.add(args[i]);
+                continue;
+            }
+        }
+        //If no files provided, return usage()
+        if (fileList.isEmpty()) {
+            // System.out.print(fileList.size());
+            usage();
+            return;
+        }
 
-}
+        if (replaceFromList.size() == 0 || replaceFromList.size() > 1) {
+            //System.out.print(replaceFromList.size());
+            usage();
+            return;
+        }
+        if (replaceToList.size() == 0 || replaceToList.size() > 1) {
+            //System.err.print(replaceToList.size());
+            usage();
+            return;
+        }
+        /*
+        * replace one string with another.
+        * If attempt to replace one string with more string, it will return usage() and vice versa
+        */
+        if (replaceFromList.size() != replaceToList.size()) {
+            usage();
+            return;
+        }
+        //
+        replaceFrom = replaceFromList.get(0);
+        replaceTo = replaceToList.get(0);
 
-catch (Exception e)
-           {
-int index = fileName.lastIndexOf(File.separator);
-String file_SN = fileName.substring(index + 1);
-System.err.println("File " + file_SN + " not found");
-}
-}
-}
-  
-}
+        /*
+        * empty string cannot be replaced with the replaceTo String
+        */
+        if (replaceFrom.length() == 0) {
+            usage();
+            return;
+        }
 
-private static void usage()
-   {
-System.err.println("Usage: Replace [-b] [-f] [-l] [-i] <from> <to> -- " + "<filename> [<filename>]*" );
-}
+        for (int i=0;i<fileList.size();i++) {
+            try {
+                //if bFlag is true, then create a backup file before replacement
+                if (bFlag) {
+                    backupfile(fileList.get(i));
+                }
+                //read the data from the file
+                String data =Files.readString(Path.of(fileList.get(i)));
+
+                // if none of first or last flag is on replace every string from replaceFrom to replaceTo string
+                if (!fFlag && !lFlag && !iFlag) {
+                    data = data.replaceAll( replaceFrom, replaceTo);
+                }
+                //replace all case insensitive string
+                if (!fFlag && !lFlag && iFlag) {
+                    data = data.replaceAll("(?i)" + replaceFrom, replaceTo);
+                }
+                // if first or last flag is on
+                else {
+                    if (fFlag) {
+                        data = firstOccurance(data, replaceFrom, replaceTo, iFlag);
+                    }
+                    if (lFlag) {
+                        data = lastOccurance(data, replaceFrom, replaceTo, iFlag);
+                    }
+                }
+                Files.writeString(Path.of(fileList.get(i)), data);
+
+
+            } catch (IOException e) {
+                File f = new File(fileList.get(i));
+                System.err.println("File " +f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf("\\")+1)  + " not found");
+            }
+        }
+    }
+    //
+    private static void backupfile(String fileName) {
+        String info= null;
+        try {
+            info = Files.readString(Path.of(fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            Files.writeString(Path.of(fileName + ".bck"), info);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String lastOccurance(String info, String replaceFrom, String replaceTo, boolean iflag) {
+
+        //if the iflag is true, then replace case insensitive replaceFrom string to replaceTo String
+        if(iflag) {
+            String str = reverse(info);
+            replaceFrom = reverse(replaceFrom);
+            replaceTo = reverse(replaceTo);
+            str = str.replaceFirst("(?i)" + replaceFrom, replaceTo);
+            info = reverse(str);
+        }
+        else{
+            String str = reverse(info);
+            replaceFrom = reverse(replaceFrom);
+            replaceTo = reverse(replaceTo);
+            str = str.replaceFirst( replaceFrom, replaceTo);
+            info = reverse(str);
+        }
+        return info;
+    }
+
+    private static String reverse(String input){
+        char[] in = input.toCharArray();
+        int begin=0;
+        int end=in.length-1;
+        char temp;
+        while(end>begin){
+            temp = in[begin];
+            in[begin]=in[end];
+            in[end] = temp;
+            end--;
+            begin++;
+        }
+        return new String(in);
+    }
+
+    private static String firstOccurance(String info, String replaceFrom, String replaceTo,boolean iflag) {
+        if(iflag)
+            return info.replaceFirst("(?i)" + replaceFrom, replaceTo);
+        else
+            return info.replaceFirst( replaceFrom, replaceTo);
+    }
+
+    private static void usage() {
+        System.err.println("Usage: Replace [-b] [-f] [-l] [-i] <from> <to> -- " + "<filename> [<filename>]*");
+    }
 
 }
